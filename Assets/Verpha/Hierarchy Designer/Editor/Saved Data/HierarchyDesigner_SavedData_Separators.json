@@ -1,0 +1,42 @@
+{
+    "items": [
+        {
+            "name": "FDGDFG",
+            "textColor": {
+                "r": 0.4941176474094391,
+                "g": 0.7372549176216126,
+                "b": 0.9372549057006836,
+                "a": 1.0
+            },
+            "backgroundColor": {
+                "r": 0.23529411852359773,
+                "g": 0.3529411852359772,
+                "b": 0.5058823823928833,
+                "a": 1.0
+            },
+            "fontStyle": 3,
+            "fontSize": 13,
+            "textAlignment": 4,
+            "backgroundImageType": 5
+        },
+        {
+            "name": "GFDGFDG",
+            "textColor": {
+                "r": 0.4941176474094391,
+                "g": 0.7372549176216126,
+                "b": 0.9372549057006836,
+                "a": 1.0
+            },
+            "backgroundColor": {
+                "r": 0.23529411852359773,
+                "g": 0.3529411852359772,
+                "b": 0.5058823823928833,
+                "a": 1.0
+            },
+            "fontStyle": 3,
+            "fontSize": 13,
+            "textAlignment": 4,
+            "backgroundImageType": 5
+        }
+    ]
+}
