@@ -29,6 +29,8 @@ public class LevelManager : MonoBehaviour
         {
             DpadParent.SetActive(true);
         }
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = false;
     }
 
     // Update is called once per frame

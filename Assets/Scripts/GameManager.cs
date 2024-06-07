@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
     public void Awake()
     {
         instance = this;
-        /*  
+        
           if (SystemInfo.deviceType == UnityEngine.DeviceType.Desktop)
           {
               DeviceType = 0;
@@ -22,18 +22,14 @@ public class GameManager : MonoBehaviour
           else if(SystemInfo.deviceType == UnityEngine.DeviceType.Console)
           {
               DeviceType = 2;
-          } */
-        DeviceType = 1;
+          }
     }
 
     // Start is called before the first frame update
     void Start()
     {
         DontDestroyOnLoad(gameObject);
-
         
-
-        //Cursor.lockState = CursorLockMode.Locked;
     }
 
     // Update is called once per frame
