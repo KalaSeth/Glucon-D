@@ -1,27 +1,14 @@
 using UnityEngine;
+using Unity.Networking;
+using Unity.Netcode;
 
-public class CameraController : MonoBehaviour
+public class CameraController : NetworkBehaviour
 {
-	public static CameraController instance;
-
-    [SerializeField] Transform targetPoint;
-
-	[SerializeField] float moveSpeed;
-	[SerializeField] float rotateSpeed;
-
-	private void Awake()
-	{
-		instance = this;
-	}
-
-	private void Start()
-	{
-		targetPoint = gameObject.transform.parent;
-	}
-
-	private void LateUpdate()
-	{
-		transform.position = Vector3.Lerp(transform.position, targetPoint.position, moveSpeed * Time.deltaTime);
-		transform.rotation = Quaternion.Lerp(transform.rotation, targetPoint.rotation, rotateSpeed * Time.deltaTime);
-	}
+    private void Update()
+    {
+        if (!IsOwner)
+        {
+            gameObject.SetActive(false);
+        }
+    }
 }

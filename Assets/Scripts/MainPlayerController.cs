@@ -2,15 +2,17 @@ using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 using UnityEngine.AI;
 
 
-public class MainPlayerController : MonoBehaviour
+public class MainPlayerController : NetworkBehaviour
 {
     /// <summary>
     /// 0 for Chicken, 1 for butcher
     /// </summary>
-    [SerializeField] int PlayerClass;
+    [SerializeField] public int PlayerClass;
+    [SerializeField] public GameObject PlayerObjectClient;
 
     /// <summary>
     /// 0 PC, 1 Android, 2 web
@@ -55,26 +57,31 @@ public class MainPlayerController : MonoBehaviour
     [SerializeField] float ChickenShootTimer;
     [SerializeField] float ButcherShootTimer;
 
+    bool LevelStarted;
     bool isDead;
 
     // Start is called before the first frame update
-    void Start()
+    public override void OnNetworkSpawn()
     {
+        MeshToggle();
+        ShootCooldown = ShootTimer;
+        Anadabin = GameObject.Find("AndaBin");
+
+        if (!IsOwner) return;
         ControlType = GameManager.instance.DeviceType;
         if (ControlType == 1)
         {
             Inputsthings();
         }
-
         VirtualCamSwitch();
-
-        ShootCooldown = ShootTimer;
-        Anadabin = GameObject.Find("AndaBin");
+       
     }
 
     // Update is called once per frame
     void Update()
     {
+        
+        
         if (ShootCooldown <= ShootTimer)
         {
             ShootCooldown -= Time.deltaTime;
@@ -85,6 +92,7 @@ public class MainPlayerController : MonoBehaviour
             }
         }
 
+        if (!IsOwner) return;
         if (Input.GetKeyDown(KeyCode.Space))
         {
             PlayerSkillCall();
@@ -93,10 +101,55 @@ public class MainPlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!IsOwner) return;
         PlayerMovement();
     }
 
     #region Virtual Player Methods
+    /// <summary>
+    /// Toggle between Butcher mesh an Chicken Mesh
+    /// </summary>
+    [ServerRpc]
+    private void PlayerMeshToggleServerRpc()
+    {
+        PlayerMeshToggleClientRpc();
+    }
+    [ClientRpc]
+    private void PlayerMeshToggleClientRpc()
+    {
+        SetPlayerMesh();
+    }
+
+    private void SetPlayerMesh()
+    {
+        PlayerClass = (int)OwnerClientId;//NetworkManager.LocalClient.PlayerObject.GetComponent<PlayerManager>().Playerclass;
+        Debug.Log(PlayerClass + " Class " + OwnerClientId);
+        if (PlayerClass == 0)
+        {
+            Debug.Log(PlayerClass + " Murgi");
+            ChickenMesh.SetActive(true);
+            ButcherMesh.SetActive(false);
+
+        }
+        else if (PlayerClass == 1)
+        {
+            Debug.Log(PlayerClass + " Halal");
+            ChickenMesh.SetActive(false);
+            ButcherMesh.SetActive(true);
+        }
+    }
+
+    private void MeshToggle()
+    {
+        if (IsServer)
+        {
+            PlayerMeshToggleClientRpc();
+        }
+        else
+        {
+            PlayerMeshToggleServerRpc();
+        }
+    }
     /// <summary>
     /// This method switches the camera, meshm stats and animation of player, depends upon the class.
     /// </summary>
@@ -104,8 +157,6 @@ public class MainPlayerController : MonoBehaviour
     {
         if (PlayerClass == 0)
         {
-            ChickenMesh.SetActive(true);
-            ButcherMesh.SetActive(false);
             ChickenVirCam.gameObject.SetActive(true);
             ButcherVirCam.gameObject.SetActive(false);
             Health = ChickenHealth;
@@ -113,8 +164,6 @@ public class MainPlayerController : MonoBehaviour
         }
         else if (PlayerClass == 1)
         {
-            ChickenMesh.SetActive(false);
-            ButcherMesh.SetActive(true);
             ChickenVirCam.gameObject.SetActive(false);
             ButcherVirCam.gameObject.SetActive(true);
             Health = ButcherHealth;
@@ -222,20 +271,25 @@ public class MainPlayerController : MonoBehaviour
     /// </summary>
     public void PlayerSkillCall()
     {
-        // 0 Chicken, 1 Butcher
-        if (PlayerClass == 0)
+        Debug.Log("Got Input");
+        if (isDead == false)
         {
-            ShootAnda();
-        }
-        else if (PlayerClass == 1)
-        {
-            ButherKatta();
+            // 0 Chicken, 1 Butcher
+            if (PlayerClass == 0)
+            {
+                ShootAndaServerRpc();
+            }
+            else if (PlayerClass == 1)
+            {
+                ButherKattaServerRpc();
+            }
         }
     }
     /// <summary>
     /// Halal ke skill.
     /// </summary>
-    void ButherKatta()
+    [ServerRpc]
+    void ButherKattaServerRpc()
     {
         if (CanShoot == true)
         {
@@ -248,12 +302,16 @@ public class MainPlayerController : MonoBehaviour
     /// <summary>
     /// Murga ke skill.
     /// </summary>
-    void ShootAnda()
+    [ServerRpc]
+    private void ShootAndaServerRpc()
     {
+        Debug.Log("Locking");
         if (CanShoot == true)
         {
+            Debug.Log("Fire");
             GameObject anda = Instantiate(Anada, AnadaRoot.transform.position, AnadaRoot.transform.rotation, Anadabin.transform);
-
+            anda.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
+            Destroy(anda, 4);
             ShootTimer = ChickenShootTimer;
             ShootCooldown = ShootTimer;
             CanShoot = false;

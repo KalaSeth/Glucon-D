@@ -15,7 +15,6 @@ public class NetworkUIforMenu : MonoBehaviour
     //Create Lobby
     [SerializeField] InputField LobbyNameTextInput;
     [SerializeField] Slider MaxPlayer;
-    [SerializeField] Toggle IsPublicToggle;
     private bool IsPublicBool;
 
     // Join Lobby
@@ -76,9 +75,7 @@ public class NetworkUIforMenu : MonoBehaviour
 
     #endregion
 
-
-
-    #region On Click Relay Actions
+#region On Click Relay Actions
     public void OnClickCreateServer()
     {
         NetworkRelayConnectionHandler.Instace.StartGameViaRelay();
@@ -88,9 +85,6 @@ public class NetworkUIforMenu : MonoBehaviour
     {
         NetworkRelayConnectionHandler.Instace.JoinRelay(JoinCodeTextInput.text);
     }
-#endregion
-
-
-
+    #endregion
 
 }

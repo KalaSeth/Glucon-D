@@ -1,17 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Networking;
+using Unity.Netcode;
 
-public class Anda : MonoBehaviour
+public class Anda : NetworkBehaviour
 {
     [SerializeField] Rigidbody AndaRB;
     [SerializeField] float Magnitude;
 
     // Start is called before the first frame update
-    void Start()
+    public void Start()
     {
         AndaRB.AddForce(transform.forward * Magnitude, ForceMode.Impulse);
-       
-        Destroy(gameObject, 4f);
     }
+
 }

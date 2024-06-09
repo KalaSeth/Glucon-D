@@ -44,7 +44,7 @@ public class NetworkRelayConnectionHandler : MonoBehaviour
 
         };
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
-        playername = "Black " + Random.Range(20, 100);
+        PlayernameAssigner();
     }
 
     private void Update()
@@ -54,6 +54,11 @@ public class NetworkRelayConnectionHandler : MonoBehaviour
     }
 
     #region Lobby
+
+    private void PlayernameAssigner()
+    {
+        playername = GameManager.instance.PlayerName;
+    }
 
     private Player GetPlayer()
     {

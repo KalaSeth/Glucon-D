@@ -8,6 +8,9 @@ public class GameManager : MonoBehaviour
 
     public int DeviceType; //  0 PC, 1 Android, 2 web,
 
+    [SerializeField] string[] PlayerNameList;
+    public string PlayerName;
+
     public void Awake()
     {
         instance = this;
@@ -29,12 +32,18 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         DontDestroyOnLoad(gameObject);
-        
+        RandomPlayerNameGenerator();
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    void RandomPlayerNameGenerator()
+    {
+        string name = (PlayerNameList[Random.Range(0, 6)] + "_" + Random.Range(2, 99)).ToString();
+        PlayerName = name;
     }
 }
