@@ -253,6 +253,7 @@ public class MainPlayerController : NetworkBehaviour
        // transform.Translate(Vector3.right * Speed * HorValue * Time.deltaTime);
 
         transform.localEulerAngles = new Vector3(0 , RotSpeedY , 0);
+        CamRoot.transform.localEulerAngles = new Vector3(RotSpeedX, CamRoot.transform.localEulerAngles.y, CamRoot.transform.localEulerAngles.z);
     }
     /// <summary>
     /// Configure Dpad
