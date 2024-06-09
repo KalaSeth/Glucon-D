@@ -29,7 +29,6 @@ QualitySettings:
     billboardsFaceCameraPosition: 0
     useLegacyDetailDistribution: 1
     vSyncCount: 0
-    realtimeGICPUUsage: 25
     lodBias: 0.3
     maximumLODLevel: 0
     enableLODCrossFade: 1
@@ -78,7 +77,6 @@ QualitySettings:
     billboardsFaceCameraPosition: 0
     useLegacyDetailDistribution: 1
     vSyncCount: 0
-    realtimeGICPUUsage: 25
     lodBias: 0.4
     maximumLODLevel: 0
     enableLODCrossFade: 1
@@ -127,7 +125,6 @@ QualitySettings:
     billboardsFaceCameraPosition: 0
     useLegacyDetailDistribution: 1
     vSyncCount: 1
-    realtimeGICPUUsage: 25
     lodBias: 0.7
     maximumLODLevel: 0
     enableLODCrossFade: 1
@@ -176,7 +173,6 @@ QualitySettings:
     billboardsFaceCameraPosition: 1
     useLegacyDetailDistribution: 1
     vSyncCount: 1
-    realtimeGICPUUsage: 50
     lodBias: 1
     maximumLODLevel: 0
     enableLODCrossFade: 1
@@ -225,7 +221,6 @@ QualitySettings:
     billboardsFaceCameraPosition: 1
     useLegacyDetailDistribution: 1
     vSyncCount: 1
-    realtimeGICPUUsage: 50
     lodBias: 1.5
     maximumLODLevel: 0
     enableLODCrossFade: 1
@@ -254,12 +249,12 @@ QualitySettings:
   - serializedVersion: 3
     name: Ultra
     pixelLightCount: 4
-    shadows: 0
-    shadowResolution: 3
-    shadowProjection: 0
+    shadows: 2
+    shadowResolution: 2
+    shadowProjection: 1
     shadowCascades: 4
-    shadowDistance: 35.9
-    shadowNearPlaneOffset: 0
+    shadowDistance: 150
+    shadowNearPlaneOffset: 3
     shadowCascade2Split: 0.21724737
     shadowCascade4Split: {x: 0.13177522, y: 0.26677805, z: 0.4666668}
     shadowmaskMode: 1
@@ -274,7 +269,6 @@ QualitySettings:
     billboardsFaceCameraPosition: 1
     useLegacyDetailDistribution: 1
     vSyncCount: 1
-    realtimeGICPUUsage: 100
     lodBias: 2
     maximumLODLevel: 0
     enableLODCrossFade: 1
