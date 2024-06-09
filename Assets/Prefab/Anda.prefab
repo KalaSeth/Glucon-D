@@ -100,7 +100,7 @@ GameObject:
   - component: {fileID: 7324410808040708399}
   m_Layer: 0
   m_Name: Anda
-  m_TagString: Untagged
+  m_TagString: Anda
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

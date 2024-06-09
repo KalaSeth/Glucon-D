@@ -10,15 +10,18 @@ public class PlayerManager : NetworkBehaviour
     /// </summary>
     private NetworkVariable<int> PlayerCast = new NetworkVariable<int>(0,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
     public int Playerclass;
+
     private NetworkVariable<bool> isReady = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
-    ulong Clintid;
+    // Write Client ID
+
     [SerializeField] GameObject PlayerPrefab;
     Button RD1Button;
 
     public override void OnNetworkSpawn()
     {
-        Clintid = NetworkManager.Singleton.LocalClientId;
+       // Update THIS 
+       // Clintid = NetworkManager.Singleton.LocalClientId;
 
         isReady.OnValueChanged += (bool previousValue, bool newValue) =>
         {
@@ -45,10 +48,23 @@ public class PlayerManager : NetworkBehaviour
         isReady.Value = !isReady.Value;
         return;
     }
-
+    /// <summary>
+    /// Check and assign Player Class to each client
+    /// </summary>
     [ServerRpc]
     private void PlayeridCheckServerRpc()
     {
+        PlayeridCheckClientRpc();
+    }
+    [ClientRpc]
+    private void PlayeridCheckClientRpc()
+    {
+        PlayerIDCheck();
+    }
+    private void PlayerIDCheck()
+    {
+        // Update tHIS
+        //int Ccount = NetworkManager.Cl
         if (((int)OwnerClientId) == 1)
         {
             PlayerCast.Value = 1;
@@ -75,4 +91,6 @@ public class PlayerManager : NetworkBehaviour
 
         // NetworkManager.SceneManager.LoadScene("Level",LoadSceneMode.Single);
     }
+
+
 }
