@@ -9,19 +9,30 @@ public class PlayerManager : NetworkBehaviour
     /// Class of player O for Murgi, 1 for Butcher
     /// </summary>
     private NetworkVariable<int> PlayerCast = new NetworkVariable<int>(0,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
+
     public int Playerclass;
 
+    /// <summary>
+    /// 
+    /// </summary>
     private NetworkVariable<bool> isReady = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
-    // Write Client ID
+    int Clintid;
+    /// <summary>
+    /// Total Client Count in current session.
+    /// </summary>
+    private NetworkVariable<int> Ccount = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    /// <summary>
+    /// Current Halal Index
+    /// </summary>
+    private NetworkVariable<int> CurrentCast = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     [SerializeField] GameObject PlayerPrefab;
     Button RD1Button;
 
     public override void OnNetworkSpawn()
     {
-       // Update THIS 
-       // Clintid = NetworkManager.Singleton.LocalClientId;
+        Clintid = (int)NetworkManager.Singleton.LocalClientId;
 
         isReady.OnValueChanged += (bool previousValue, bool newValue) =>
         {
@@ -34,8 +45,7 @@ public class PlayerManager : NetworkBehaviour
             if (!IsOwner) return;
             LoadLevelServerRpc();
         });
-
-        PlayeridCheckServerRpc();
+        AssignPlayerCast();
     }
     // Update is called once per frame
     void Update()
@@ -51,6 +61,7 @@ public class PlayerManager : NetworkBehaviour
     /// <summary>
     /// Check and assign Player Class to each client
     /// </summary>
+    #region PlayerID Check
     [ServerRpc]
     private void PlayeridCheckServerRpc()
     {
@@ -63,14 +74,35 @@ public class PlayerManager : NetworkBehaviour
     }
     private void PlayerIDCheck()
     {
-        // Update tHIS
-        //int Ccount = NetworkManager.Cl
-        if (((int)OwnerClientId) == 1)
+        Ccount.Value = NetworkManager.ConnectedClients.Count;
+        CurrentCast.Value = Random.Range(0,Ccount.Value);
+        MakeHalal();
+        Debug.Log(OwnerClientId + " CurrentCast " + CurrentCast + " PlayerCast " + PlayerCast);
+        
+    }
+    private void MakeHalal()
+    {
+        if (CurrentCast.Value == (int)OwnerClientId)
         {
             PlayerCast.Value = 1;
         }
-        Debug.Log(OwnerClientId + " PlayerCast" + PlayerCast);
     }
+    /// <summary>
+    /// Assign a Hallal amog Murgi and sync it across server.
+    /// </summary>
+    private void AssignPlayerCast()
+    {
+       if (IsServer)
+        {
+            PlayeridCheckClientRpc();
+        }
+        else
+        {
+            PlayeridCheckClientRpc();
+        }
+    }
+    #endregion
+    
     /// <summary>
     /// Switch to gameplay for all clients
     /// </summary>
