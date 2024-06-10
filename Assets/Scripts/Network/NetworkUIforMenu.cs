@@ -85,6 +85,11 @@ public class NetworkUIforMenu : MonoBehaviour
     {
         NetworkRelayConnectionHandler.Instace.JoinRelay(JoinCodeTextInput.text);
     }
+
+    public void OnClickDisconnectServer()
+    {
+        NetworkRelayConnectionHandler.Instace.DisconnectRelay();
+    }
     #endregion
 
 }

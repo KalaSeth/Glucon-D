@@ -13,6 +13,7 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - _GLOSSYREFLECTIONS_OFF
+  - _NORMALMAP
   m_InvalidKeywords:
   - _CLIPPED_ON
   - _SEGMENTED_ON
@@ -28,7 +29,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BumpMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 762a0c671437c3c48a8d21f9eecfd48c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -44,7 +45,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _EmissionMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: a77644296c9bbfb4ba322c897f152e08, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
@@ -56,7 +57,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 627cd8b917cb4dd46a4cc2236ad9b226, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
@@ -66,6 +67,14 @@ Material:
     m_Ints: []
     m_Floats:
     - _AmbientCol: 0.377
+    - _BaseStages: -0.5
+    - _BendRotationRandom: 0.2
+    - _BladeCurve: 2
+    - _BladeForward: 0.38
+    - _BladeHeight: 0.5
+    - _BladeHeightRandom: 0.3
+    - _BladeWidth: 0.05
+    - _BladeWidthRandom: 0.02
     - _BumpScale: 1
     - _Clipped: 1
     - _ColBright: 0
@@ -78,6 +87,7 @@ Material:
     - _GlossyReflections: 0
     - _Lumin: 0.43
     - _MaxLight: 1
+    - _MaxStages: 7
     - _Metallic: 0
     - _MinLight: 0.486
     - _Mode: 0
@@ -94,10 +104,15 @@ Material:
     - _SrcBlend: 1
     - _Steps: 11.2
     - _StpSmooth: 0
+    - _TranslucentGain: 0.5
     - _UVSec: 0
+    - _ViewLOD: 48
+    - _WindStrength: 0.3
     - _ZWrite: 1
     m_Colors:
+    - _BottomColor: {r: 0.0625, g: 0.375, b: 0.07, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShnColor: {r: 0.5896226, g: 1, b: 0.97607666, a: 1}
+    - _TopColor: {r: 0.57, g: 0.84, b: 0.32, a: 1}
   m_BuildTextureStacks: []

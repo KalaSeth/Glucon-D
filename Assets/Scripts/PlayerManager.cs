@@ -8,27 +8,30 @@ public class PlayerManager : NetworkBehaviour
     /// <summary>
     /// Class of player O for Murgi, 1 for Butcher
     /// </summary>
-    private NetworkVariable<int> PlayerCast = new NetworkVariable<int>(0,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
+    [SerializeField] private NetworkVariable<int> PlayerCast = new NetworkVariable<int>(0,NetworkVariableReadPermission.Everyone,NetworkVariableWritePermission.Server);
 
     public int Playerclass;
 
     /// <summary>
     /// 
     /// </summary>
-    private NetworkVariable<bool> isReady = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    [SerializeField] private NetworkVariable<bool> isReady = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
     int Clintid;
+    private int ClientCount;
+    int Index;
     /// <summary>
     /// Total Client Count in current session.
     /// </summary>
-    private NetworkVariable<int> Ccount = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    [SerializeField] private NetworkVariable<int> Ccount = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone);
     /// <summary>
     /// Current Halal Index
     /// </summary>
-    private NetworkVariable<int> CurrentCast = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    [SerializeField] public NetworkVariable<int> CurrentCast = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone);
 
     [SerializeField] GameObject PlayerPrefab;
     Button RD1Button;
+    Button AtankButton;
 
     public override void OnNetworkSpawn()
     {
@@ -45,12 +48,18 @@ public class PlayerManager : NetworkBehaviour
             if (!IsOwner) return;
             LoadLevelServerRpc();
         });
-        AssignPlayerCast();
+
+        AtankButton = GameObject.Find("Atank").GetComponent<Button>();
+        AtankButton.onClick.AddListener(() =>
+        {
+            //AssignPlayerCast();
+        });
+        
     }
     // Update is called once per frame
     void Update()
     {
-        // LoadLevelClientRpc();
+        
     }
 
     public void OnClickReady()
@@ -61,48 +70,11 @@ public class PlayerManager : NetworkBehaviour
     /// <summary>
     /// Check and assign Player Class to each client
     /// </summary>
+
     #region PlayerID Check
-    [ServerRpc]
-    private void PlayeridCheckServerRpc()
-    {
-        PlayeridCheckClientRpc();
-    }
-    [ClientRpc]
-    private void PlayeridCheckClientRpc()
-    {
-        PlayerIDCheck();
-    }
-    private void PlayerIDCheck()
-    {
-        Ccount.Value = NetworkManager.ConnectedClients.Count;
-        CurrentCast.Value = Random.Range(0,Ccount.Value);
-        MakeHalal();
-        Debug.Log(OwnerClientId + " CurrentCast " + CurrentCast + " PlayerCast " + PlayerCast);
-        
-    }
-    private void MakeHalal()
-    {
-        if (CurrentCast.Value == (int)OwnerClientId)
-        {
-            PlayerCast.Value = 1;
-        }
-    }
-    /// <summary>
-    /// Assign a Hallal amog Murgi and sync it across server.
-    /// </summary>
-    private void AssignPlayerCast()
-    {
-       if (IsServer)
-        {
-            PlayeridCheckClientRpc();
-        }
-        else
-        {
-            PlayeridCheckClientRpc();
-        }
-    }
+
     #endregion
-    
+
     /// <summary>
     /// Switch to gameplay for all clients
     /// </summary>
@@ -114,13 +86,11 @@ public class PlayerManager : NetworkBehaviour
     [ServerRpc]
     private void LoadLevelServerRpc()
     {   
-        Playerclass = PlayerCast.Value;
-        Debug.Log("Switching to Level"); Debug.LogError("Spawn");
-        GameObject newPlayer = Instantiate(PlayerPrefab, LevelManager.instance.SpawnLocations[Random.Range(0, LevelManager.instance.SpawnLocations.Length)].transform.position, LevelManager.instance.SpawnLocations[Random.Range(0, LevelManager.instance.SpawnLocations.Length)].rotation);
-
+        Index = (int)OwnerClientId;
+        
+        GameObject newPlayer = Instantiate(PlayerPrefab, LevelManager.instance.SpawnLocations[Index].transform.position, LevelManager.instance.SpawnLocations[Index].rotation); 
         newPlayer.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
         
-
         // NetworkManager.SceneManager.LoadScene("Level",LoadSceneMode.Single);
     }
 

@@ -15,4 +15,21 @@ public class Anda : NetworkBehaviour
         AndaRB.AddForce(transform.forward * Magnitude, ForceMode.Impulse);
     }
 
+    [ServerRpc(RequireOwnership = false)]
+    private void DespawnAndDestroyServerRpc()
+    {
+        if (IsServer)
+        {
+            NetworkObject.Despawn(true);
+            Destroy(gameObject);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (IsServer)
+        {
+            DespawnAndDestroyServerRpc();
+        }
+    }
 }

@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.Networking;
 using Unity.Netcode;
 
 public class LevelManager : NetworkBehaviour
@@ -15,12 +14,13 @@ public class LevelManager : NetworkBehaviour
     public FloatingJoystick CamDpad;
 
     public bool LevelStarted;
+   
     /// <summary>
     /// 0 if Chicken won, 1 if Butcher won
     /// </summary>
     public int WhoWon;
     public bool LevelOver;
-    float LevelTimer;
+ 
 
     [SerializeField] GameObject PlayerBucket;
     
@@ -45,12 +45,21 @@ public class LevelManager : NetworkBehaviour
         }
         Cursor.lockState = CursorLockMode.Confined;
         // Cursor.visible = false;
-
+       
     }
+
+   
 
     // Update is called once per frame
     void Update()
     {
-
+        if (LevelStarted == true)
+        {
+           // CallLevelTimer();
+        }
     }
+
+    
+
+    
 }

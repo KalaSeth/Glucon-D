@@ -4,14 +4,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 
 public class MainPlayerController : NetworkBehaviour
 {
-    /// <summary>
-    /// 0 for Chicken, 1 for butcher
-    /// </summary>
-    [SerializeField] public int PlayerClass;
+    #region Variables initialization
+
+    public int PlayerClass;
+    
     [SerializeField] public GameObject PlayerObjectClient;
 
     /// <summary>
@@ -19,33 +20,23 @@ public class MainPlayerController : NetworkBehaviour
     /// </summary>
     int ControlType;
     [SerializeField] CinemachineVirtualCamera ChickenVirCam;
-    [SerializeField] CinemachineVirtualCamera ButcherVirCam;
     [SerializeField] NavMeshAgent PlayerNavi;
 
     [SerializeField] GameObject ChickenMesh;
-    [SerializeField] GameObject ButcherMesh;
 
     float HorValue, VarValue;
 
     FloatingJoystick DPad;
     FloatingJoystick CamDPad;
 
-    [SerializeField] float ChickenHealth;
-    [SerializeField] float ButcherHealth;
-    float Health;
-
     [SerializeField] float ChickenSpeed;
-    [SerializeField] float ButcherSpeed;
     float Speed;
-
-    // Kudna jaruri hai kya?
-    //[SerializeField] float ChickenJumpForce;
-    //[SerializeField] float ButcherJumpForce;
-    //float JumpForce;
 
     [SerializeField] float RotSensi;
     float RotSpeedX, RotSpeedY;
 
+    Animator PlayerAnimator;
+    [SerializeField] GameObject PlayerAnimatorObj;
     [SerializeField] GameObject CamRoot;
     [SerializeField] GameObject Anada;
     [SerializeField] GameObject AnadaRoot;
@@ -55,42 +46,44 @@ public class MainPlayerController : NetworkBehaviour
     float ShootCooldown;
     float ShootTimer;
     [SerializeField] float ChickenShootTimer;
-    [SerializeField] float ButcherShootTimer;
 
-    bool LevelStarted;
-    bool isDead;
+    Button ShootButton;
+    #endregion
 
+    #region Start
     // Start is called before the first frame update
     public override void OnNetworkSpawn()
     {
-        MeshToggle();
         ShootCooldown = ShootTimer;
         Anadabin = GameObject.Find("AndaBin");
+        PlayerAnimator = PlayerAnimatorObj.GetComponent<Animator>();
+        ChickenVirCam.gameObject.SetActive(true);
+
+        if (GameManager.instance.DeviceType == 1)
+        { 
+            ShootButton = GameObject.Find("AndaMar").GetComponent<Button>();
+            ShootButton.onClick.AddListener(() =>
+            {
+                if (!IsOwner) return;
+                PlayerSkillCall();
+            });
+        }
 
         if (!IsOwner) return;
         ControlType = GameManager.instance.DeviceType;
+
         if (ControlType == 1)
         {
             Inputsthings();
-        }
-        VirtualCamSwitch();
-       
+        }        
     }
+    #endregion
 
+    #region Updates
     // Update is called once per frame
     void Update()
     {
-        
-        
-        if (ShootCooldown <= ShootTimer)
-        {
-            ShootCooldown -= Time.deltaTime;
-            if (ShootCooldown <= 0)
-            {
-                ShootCooldown = 0;
-                CanShoot = true;
-            }
-        }
+        AndaCooldown();
 
         if (!IsOwner) return;
         if (Input.GetKeyDown(KeyCode.Space))
@@ -104,115 +97,63 @@ public class MainPlayerController : NetworkBehaviour
         if (!IsOwner) return;
         PlayerMovement();
     }
+    #endregion
 
     #region Virtual Player Methods
+
     /// <summary>
-    /// Toggle between Butcher mesh an Chicken Mesh
+    /// Configure Dpad
     /// </summary>
-    [ServerRpc]
-    private void PlayerMeshToggleServerRpc()
+    void Inputsthings()
     {
-        PlayerMeshToggleClientRpc();
-    }
-    [ClientRpc]
-    private void PlayerMeshToggleClientRpc()
-    {
-        SetPlayerMesh();
+        DPad = LevelManager.instance.Dpad;
+        CamDPad = LevelManager.instance.CamDpad;
     }
 
-    private void SetPlayerMesh()
+    /// <summary>
+    /// Timer for Cooldown
+    /// </summary>
+    void AndaCooldown()
     {
-        PlayerClass = (int)OwnerClientId;//NetworkManager.LocalClient.PlayerObject.GetComponent<PlayerManager>().Playerclass;
-        Debug.Log(PlayerClass + " Class " + OwnerClientId);
-        if (PlayerClass == 0)
+        if (ShootCooldown <= ShootTimer)
         {
-            Debug.Log(PlayerClass + " Murgi");
-            ChickenMesh.SetActive(true);
-            ButcherMesh.SetActive(false);
+            ShootCooldown -= Time.deltaTime;
+            if (ShootCooldown <= 0)
+            {
+                ShootCooldown = 0;
+                CanShoot = true;
+            }
+        }
+    }
+    #endregion
 
-        }
-        else if (PlayerClass == 1)
+    #region Animation Methods
+
+    /// <summary>
+    /// Animates the PLayer movement
+    /// </summary>
+    void AnimateMovemet()
+    {
+        if (PlayerNavi.velocity != Vector3.zero)
         {
-            Debug.Log(PlayerClass + " Halal");
-            ChickenMesh.SetActive(false);
-            ButcherMesh.SetActive(true);
+            PlayerAnimator.SetBool("walk", true);
         }
+        else PlayerAnimator.SetBool("walk", false);
     }
 
-    private void MeshToggle()
-    {
-        if (IsServer)
-        {
-            PlayerMeshToggleClientRpc();
-        }
-        else
-        {
-            PlayerMeshToggleServerRpc();
-        }
-    }
     /// <summary>
-    /// This method switches the camera, meshm stats and animation of player, depends upon the class.
+    /// Animate the player jump
     /// </summary>
-    void VirtualCamSwitch()
-    {
-        if (PlayerClass == 0)
-        {
-            ChickenVirCam.gameObject.SetActive(true);
-            ButcherVirCam.gameObject.SetActive(false);
-            Health = ChickenHealth;
-
-        }
-        else if (PlayerClass == 1)
-        {
-            ChickenVirCam.gameObject.SetActive(false);
-            ButcherVirCam.gameObject.SetActive(true);
-            Health = ButcherHealth;
-        }
-    }
-    /// <summary>
-    /// This method checks the health of player.
-    /// </summary>
-    void HealthCheckforPlayer()
-    {
-        if (Health <= 1)
-        {
-            Health = 0;
-            isDead = true;
-            PlayerDed();
-        }
-    }
-    /// <summary>
-    /// This Method calls the death logic.
-    /// </summary>
-    void PlayerDed()
-    {
-        if (PlayerClass == 0)
-        {
-            MurgaDed();
-        }
-        else if (PlayerClass == 1)
-        {
-            ButcherDed();
-        }
-    }
-    /// <summary>
-    /// This Method runs the after death logic for Murgi.
-    /// </summary>
-    void MurgaDed()
-    {
-
-    }
-    /// <summary>
-    /// This Method runs the after death logic for Butcher.
-    /// </summary>
-    void ButcherDed()
+    void AnimateJump()
     {
 
     }
     #endregion
 
-
     #region Movement Methods
+    /// <summary>
+    /// Handels the main Player Movement
+    /// </summary>
     void PlayerMovement()
     {
         if (ControlType == 1)   // if Android
@@ -221,7 +162,7 @@ public class MainPlayerController : NetworkBehaviour
             VarValue = DPad.Vertical;
 
             RotSpeedY += CamDPad.Horizontal * RotSensi;
-            RotSpeedX += CamDPad.Vertical * -RotSensi;
+            RotSpeedX += DPad.Vertical * RotSensi;
         }
         else
         {
@@ -231,114 +172,54 @@ public class MainPlayerController : NetworkBehaviour
             RotSpeedX += Input.GetAxis("Mouse Y") * RotSensi;
             RotSpeedY += Input.GetAxis("Mouse X") * RotSensi;
         }
-
+        
         // Player Class > 0 Chicken, 1 Butcher
         if (PlayerClass == 0)
         {
             Speed = ChickenSpeed;
             //JumpForce = ChickenJumpForce;
         }
-        else if (PlayerClass == 1)
-        {
-            Speed = ButcherSpeed;
-            //JumpForce = ButcherJumpForce;
-        }
-
+        
         PlayerNavi.speed = Speed;
 
         Vector3 newPos = transform.position + transform.right * HorValue + transform.forward * VarValue;
         PlayerNavi.destination = newPos;
 
-       // transform.Translate(Vector3.forward * Speed * VarValue * Time.deltaTime);
-       // transform.Translate(Vector3.right * Speed * HorValue * Time.deltaTime);
-
         transform.localEulerAngles = new Vector3(0 , RotSpeedY , 0);
-        CamRoot.transform.localEulerAngles = new Vector3(RotSpeedX, CamRoot.transform.localEulerAngles.y, CamRoot.transform.localEulerAngles.z);
-    }
-    /// <summary>
-    /// Configure Dpad
-    /// </summary>
-    void Inputsthings()
-    {
-        DPad = LevelManager.instance.Dpad;
-        CamDPad = LevelManager.instance.CamDpad;
-        Debug.Log(DPad);
+
+        AnimateMovemet();
     }
     #endregion
 
     #region Skill Methods
+
     /// <summary>
     /// Murga and halal ke skill call karta hai, depends on the Player class.
     /// </summary>
     public void PlayerSkillCall()
     {
-        Debug.Log("Got Input");
-        if (isDead == false)
-        {
-            // 0 Chicken, 1 Butcher
-            if (PlayerClass == 0)
-            {
-                ShootAndaServerRpc();
-            }
-            else if (PlayerClass == 1)
-            {
-                ButherKattaServerRpc();
-            }
-        }
-    }
-    /// <summary>
-    /// Halal ke skill.
-    /// </summary>
-    [ServerRpc]
-    void ButherKattaServerRpc()
-    {
         if (CanShoot == true)
         {
-            Debug.Log("ButcherSkill");
-            ShootTimer = ButcherShootTimer;
-            ShootCooldown = ShootTimer;
-            CanShoot = false;
+            SpawnAndaServerRpc();
+            AnimateJump();
         }
     }
+
     /// <summary>
-    /// Murga ke skill.
+    /// Murga ke skill
     /// </summary>
     [ServerRpc]
-    private void ShootAndaServerRpc()
+    private void SpawnAndaServerRpc(ServerRpcParams rpcParams = default)
     {
-        Debug.Log("Locking");
-        if (CanShoot == true)
+        GameObject andaInstance = Instantiate(Anada, AnadaRoot.transform.position, AnadaRoot.transform.rotation, Anadabin.transform);
+        NetworkObject networkObject = andaInstance.GetComponent<NetworkObject>();
+        if (networkObject != null)
         {
-            Debug.Log("Fire");
-            GameObject anda = Instantiate(Anada, AnadaRoot.transform.position, AnadaRoot.transform.rotation, Anadabin.transform);
-            anda.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
-            Destroy(anda, 4);
-            ShootTimer = ChickenShootTimer;
-            ShootCooldown = ShootTimer;
-            CanShoot = false;
+            networkObject.SpawnWithOwnership(rpcParams.Receive.SenderClientId);
         }
+        ShootTimer = ChickenShootTimer;
+        ShootCooldown = ShootTimer;
+        CanShoot = false;
     }
     #endregion
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.tag == "Saw")
-        {
-            if (PlayerClass == 0)
-            {
-                Health--; // Make sure this does not match the value of butcher
-                HealthCheckforPlayer();
-            }
-        }
-
-        if (other.gameObject.tag == "Anda")
-        {
-            if (PlayerClass == 1)
-            {
-                Health--; // Make sure this does not match the value of Chicken
-                HealthCheckforPlayer();
-            }
-        }
-    }
-
 }

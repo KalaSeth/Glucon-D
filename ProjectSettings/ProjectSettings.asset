@@ -154,6 +154,7 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
+    Android: com.ZherBlast.MurgiMassacre
     Standalone: com.ZherBlast.Murgi-Massacre
   buildNumber:
     Bratwurst: 0

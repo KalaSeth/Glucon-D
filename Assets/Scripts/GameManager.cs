@@ -6,7 +6,10 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
-    public int DeviceType; //  0 PC, 1 Android, 2 web,
+    /// <summary>
+    /// 0 PC, 1 Android, 2 web,
+    /// </summary>
+    public int DeviceType; 
 
     [SerializeField] string[] PlayerNameList;
     public string PlayerName;
