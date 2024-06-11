@@ -14,6 +14,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] string[] PlayerNameList;
     public string PlayerName;
 
+    [SerializeField] GameObject PlayerBucket;
+    [SerializeField] public Transform[] SpawnLocations;
+
+    [SerializeField] GameObject DpadParent;
+    public FloatingJoystick Dpad;
+    public FloatingJoystick CamDpad;
+
     public void Awake()
     {
         instance = this;

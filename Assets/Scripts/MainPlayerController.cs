@@ -49,6 +49,7 @@ public class MainPlayerController : NetworkBehaviour
 
     Button ShootButton;
     [SerializeField] private float spawnForceMagnitude;
+
     #endregion
 
     #region Start
@@ -106,8 +107,8 @@ public class MainPlayerController : NetworkBehaviour
     /// </summary>
     void Inputsthings()
     {
-        DPad = LevelManager.instance.Dpad;
-        CamDPad = LevelManager.instance.CamDpad;
+        DPad = GameManager.instance.Dpad;
+        CamDPad = GameManager.instance.CamDpad;
     }
 
     /// <summary>

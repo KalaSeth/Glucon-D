@@ -6,10 +6,11 @@ using UnityEngine.UI;
 public class PlayerManager : NetworkBehaviour
 {
     int Index;
+    public bool IsReady { get; private set; }
 
     [SerializeField] GameObject PlayerPrefab;
     Button RD1Button;
-    Button AtankButton;
+    Button readyButton;
 
     public override void OnNetworkSpawn()
     {
@@ -20,10 +21,11 @@ public class PlayerManager : NetworkBehaviour
             LoadLevelServerRpc();
         });
 
-        AtankButton = GameObject.Find("Atank").GetComponent<Button>();
-        AtankButton.onClick.AddListener(() =>
+        readyButton = GameObject.Find("Atank").GetComponent<Button>();
+        readyButton.onClick.AddListener(() =>
         {
-            //AssignPlayerCast();
+            if (!IsOwner) return;
+            PressReadyButton();
         });
     }
 
@@ -32,7 +34,16 @@ public class PlayerManager : NetworkBehaviour
     {
         Index = (int)OwnerClientId;
 
-        GameObject newPlayer = Instantiate(PlayerPrefab, LevelManager.instance.SpawnLocations[Index].transform.position, LevelManager.instance.SpawnLocations[Index].rotation);
+        GameObject newPlayer = Instantiate(PlayerPrefab, GameManager.instance.SpawnLocations[Index].transform.position, GameManager.instance.SpawnLocations[Index].rotation);
         newPlayer.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
+    }
+
+    public void PressReadyButton()
+    {
+        if (!IsReady)
+        {
+            IsReady = true;
+            GetComponent<PlayerServer>().PlayerReadyServerRpc();
+        }
     }
 }

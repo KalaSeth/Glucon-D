@@ -1,65 +1,75 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using Unity.Services.Lobbies.Models;
 
 public class LevelManager : NetworkBehaviour
 {
-    public static LevelManager instance;
+    public float countdownDuration;
+    private float countdownTimer;
+    [SerializeField] private bool isCountdownActive;
 
-    int ControlType; // 0 PC, 1 Android, 2 web
-
-    [SerializeField] GameObject DpadParent;
-    public FloatingJoystick Dpad;
-    public FloatingJoystick CamDpad;
-
-    public bool LevelStarted;
-   
-    /// <summary>
-    /// 0 if Chicken won, 1 if Butcher won
-    /// </summary>
-    public int WhoWon;
-    public bool LevelOver;
- 
-
-    [SerializeField] GameObject PlayerBucket;
-    
-    [SerializeField] public Transform[] SpawnLocations;
-
-    public void Awake()
+    // Start the countdown when all players are ready
+    public void StartCountdown()
     {
-        instance = this;
-    }
-
-    // Start is called before the first frame update
-    public void Start()
-    {
-        ControlType = GameManager.instance.DeviceType;
-        if (ControlType == 0)
+        if (IsServer)
         {
-            DpadParent.SetActive(false);
-        }
-        else if (ControlType == 1)
-        {
-            DpadParent.SetActive(true);
-        }
-        Cursor.lockState = CursorLockMode.Confined;
-        // Cursor.visible = false;
-       
-    }
+            // Check if all players are ready
+            if (AreAllPlayersReady())
+            {
+                countdownTimer = countdownDuration;
+                isCountdownActive = true;
 
-   
+                CountdownStartClientRpc();
+            }
+        }
+    }
 
     // Update is called once per frame
     void Update()
     {
-        if (LevelStarted == true)
+        if (isCountdownActive)
         {
-           // CallLevelTimer();
+            countdownTimer -= Time.deltaTime;
+            if (countdownTimer <= 0)
+            {
+                isCountdownActive = false;
+                DisplayMessageAndScore();
+            }
         }
     }
 
-    
+    /// <summary>
+    /// Method to check if all players are ready
+    /// </summary>
+    private bool AreAllPlayersReady()
+    {
+        foreach (var client in NetworkManager.Singleton.ConnectedClients)
+        {
+            var playerObject = client.Value.PlayerObject;
+            if (playerObject == null || !playerObject.GetComponent<PlayerManager>().IsReady)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 
-    
+    /// <summary>
+    /// ClientRpc to notify clients to start their countdown timers
+    /// </summary>
+    [ClientRpc]
+    private void CountdownStartClientRpc()
+    {
+        // Level Start
+        isCountdownActive = true;
+    }
+
+    /// <summary>
+    /// Method to Reset the game and display message and score
+    /// </summary>
+    private void DisplayMessageAndScore()
+    {
+        // Level Over
+        
+    }
 }
