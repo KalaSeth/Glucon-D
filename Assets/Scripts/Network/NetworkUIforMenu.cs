@@ -23,14 +23,14 @@ public class NetworkUIforMenu : MonoBehaviour
 
     private void Update()
     {
-        JoinCodeText.text = NetworkRelayConnectionHandler.Instace.GeneratedJoinCode;
-        LobbyCodeText.text = NetworkRelayConnectionHandler.Instace.GeneratedLobbyCode;
+        JoinCodeText.text = "Join Code : " + NetworkRelayConnectionHandler.Instace.GeneratedJoinCode;
+        LobbyCodeText.text = "Join Code : " + NetworkRelayConnectionHandler.Instace.GeneratedLobbyCode;
     }
 
 #region On Click Lobby Actions
     public void OnClickCreateLobby()
     {
-        NetworkRelayConnectionHandler.Instace.CreateLobby(LobbyNameTextInput.text.ToString(), (int)MaxPlayer.value, IsPublicBool);
+        NetworkRelayConnectionHandler.Instace.CreateLobby(GameManager.instance.PlayerName, 10, IsPublicBool);
     }
 
     public void OnClickListLobbies()

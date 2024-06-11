@@ -5,11 +5,5 @@ using Unity.Netcode;
 
 public class PlayerServer : NetworkBehaviour
 {
-    public LevelManager levelManager;
 
-    [ServerRpc]
-    public void PlayerReadyServerRpc()
-    {
-        levelManager.StartCountdown();
-    }
 }

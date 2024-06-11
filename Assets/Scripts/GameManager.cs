@@ -43,6 +43,11 @@ public class GameManager : MonoBehaviour
     {
         DontDestroyOnLoad(gameObject);
         RandomPlayerNameGenerator();
+
+        if (DeviceType == 0)
+        {
+            DpadParent.SetActive(false);
+        }
     }
 
     // Update is called once per frame

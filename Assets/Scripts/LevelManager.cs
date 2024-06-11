@@ -1,31 +1,89 @@
 using UnityEngine;
+using UnityEngine.UI;
 using Unity.Netcode;
 using Unity.Services.Lobbies.Models;
+using System.Collections.Generic;
 
 public class LevelManager : NetworkBehaviour
 {
-    public float countdownDuration;
+    public float countdownDuration = 10800;
     private float countdownTimer;
-    [SerializeField] private bool isCountdownActive;
+    private bool isCountdownActive = false;
+    private int readyPlayerCount = 0;
 
-    // Start the countdown when all players are ready
-    public void StartCountdown()
+    // List to keep track of players
+    private List<PlayerReadinessHandler> players = new List<PlayerReadinessHandler>();
+
+    private void Start()
     {
         if (IsServer)
         {
-            // Check if all players are ready
-            if (AreAllPlayersReady())
-            {
-                countdownTimer = countdownDuration;
-                isCountdownActive = true;
-
-                CountdownStartClientRpc();
-            }
+            // Register client connection callback
+            NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
         }
     }
 
+    private void OnClientConnected(ulong clientId)
+    {
+        var playerObject = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject;
+        var playerReadinessHandler = playerObject.GetComponent<PlayerReadinessHandler>();
+        if (playerReadinessHandler != null)
+        {
+            players.Add(playerReadinessHandler);
+            playerReadinessHandler.OnPlayerReady.AddListener(OnPlayerReady);
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void AddPlayerServerRpc(ulong playerId)
+    {
+        var playerObject = NetworkManager.Singleton.SpawnManager.SpawnedObjects[playerId];
+        var playerReadinessHandler = playerObject.GetComponent<PlayerReadinessHandler>();
+        if (playerReadinessHandler != null)
+        {
+            players.Add(playerReadinessHandler);
+            playerReadinessHandler.OnPlayerReady.AddListener(OnPlayerReady);
+        }
+    }
+
+    public void OnPlayerReady()
+    {
+        Debug.Log("Level Readuy");
+        readyPlayerCount++;
+        if (readyPlayerCount == players.Count)
+        {
+            Debug.Log("Count Set");
+            StartCountdown();
+
+        }
+    }
+
+    // Start the countdown when all players are ready
+    private void StartCountdown()
+    {
+        Debug.Log("Starting Timer");
+        if (IsServer)
+        {
+            countdownTimer = countdownDuration;
+            isCountdownActive = true;
+
+            // Notify clients to start their countdown timers
+            CountdownStartClientRpc();
+
+            // Set IsCountdownRunning to true for all players
+            foreach (var player in players)
+            {
+                player.SetCountdownRunning(true);
+                
+            }
+
+
+        }
+        
+    }
+
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (isCountdownActive)
         {
@@ -34,42 +92,54 @@ public class LevelManager : NetworkBehaviour
             {
                 isCountdownActive = false;
                 DisplayMessageAndScore();
+
+                // Set IsCountdownRunning to false for all players
+                foreach (var player in players)
+                {
+                    player.SetCountdownRunning(false);
+                }
             }
         }
     }
 
-    /// <summary>
-    /// Method to check if all players are ready
-    /// </summary>
-    private bool AreAllPlayersReady()
+    public void OnPlayerDied(ulong playerId)
     {
-        foreach (var client in NetworkManager.Singleton.ConnectedClients)
+        players.RemoveAll(p => p.NetworkObjectId == playerId); // Remove dead players from the list
+
+        if (players.Count == 1)
         {
-            var playerObject = client.Value.PlayerObject;
-            if (playerObject == null || !playerObject.GetComponent<PlayerManager>().IsReady)
-            {
-                return false;
-            }
+            // The last alive player is the winner
+            var winner = players[0];
+            AnnounceWinner(winner);
         }
-        return true;
     }
 
-    /// <summary>
-    /// ClientRpc to notify clients to start their countdown timers
-    /// </summary>
+    private void AnnounceWinner(PlayerReadinessHandler winner)
+    {
+        // Announce the winner logic here
+        Debug.Log("The winner is: " + winner.NetworkObjectId);
+
+        // Despawn and destroy the winner's object
+        winner.GetComponent<PlayerDeathHandler>().Die();
+    }
+
+    // ClientRpc to notify clients to start their countdown timers
     [ClientRpc]
     private void CountdownStartClientRpc()
     {
-        // Level Start
-        isCountdownActive = true;
+        Debug.Log("Starting Timer RPC Call");
+        // Set IsCountdownRunning to true for all players
+        foreach (var player in players)
+        {
+            player.SetCountdownRunning(true);
+        }
+       
     }
 
-    /// <summary>
-    /// Method to Reset the game and display message and score
-    /// </summary>
+    // Method to display message and score
     private void DisplayMessageAndScore()
     {
-        // Level Over
-        
+        // Display message and score logic here
+        Debug.Log("Timer finished! Displaying message and score.");
     }
 }

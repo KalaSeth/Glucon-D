@@ -48,6 +48,7 @@ public class MainPlayerController : NetworkBehaviour
     [SerializeField] float ChickenShootTimer;
 
     Button ShootButton;
+    Button ShootButton2;
     [SerializeField] private float spawnForceMagnitude;
 
     #endregion
@@ -64,10 +65,18 @@ public class MainPlayerController : NetworkBehaviour
         if (GameManager.instance.DeviceType == 1)
         { 
             ShootButton = GameObject.Find("AndaMar").GetComponent<Button>();
+            ShootButton2 = GameObject.Find("AndaMar2").GetComponent<Button>();
             ShootButton.onClick.AddListener(() =>
             {
                 if (!IsOwner) return;
                 PlayerSkillCall();
+                AnimateJump();
+            });
+            ShootButton2.onClick.AddListener(() =>
+            {
+                if (!IsOwner) return;
+                PlayerSkillCall();
+                AnimateJump();
             });
         }
 
@@ -147,7 +156,7 @@ public class MainPlayerController : NetworkBehaviour
     /// </summary>
     void AnimateJump()
     {
-
+        PlayerAnimator.SetTrigger("shoot");
     }
     #endregion
 

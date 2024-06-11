@@ -45,8 +45,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37a8e58c61ea01e409a7345f855bc052, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  countdownDuration: 0
+  countdownDuration: 20
   isCountdownActive: 0
+  readyPlayerCount: 0
 --- !u!114 &3765684148929525701
 MonoBehaviour:
   m_ObjectHideFlags: 0

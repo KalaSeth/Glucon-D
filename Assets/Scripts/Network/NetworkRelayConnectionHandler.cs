@@ -52,6 +52,7 @@ public class NetworkRelayConnectionHandler : MonoBehaviour
     {
         Heartbeater();
         LobbyPollUpdate();
+        PlayernameAssigner();
     }
 
     #region Lobby
@@ -113,7 +114,11 @@ public class NetworkRelayConnectionHandler : MonoBehaviour
                         Debug.Log("Relay Secured, [Exiting Lobby --> Connecting Relay]");
                     }
                     joinedlobby = null;
+
+                    MenuManager.instance.GotIn();
                 }
+
+                MenuManager.instance.LobbyCount = lobby.Players.Count;
             }
         }
     }
@@ -211,6 +216,7 @@ public class NetworkRelayConnectionHandler : MonoBehaviour
         catch (LobbyServiceException e)
         {
             Debug.Log(e);
+            MenuManager.instance.ErrorOnJoin();
         }
     }
 
@@ -419,6 +425,7 @@ public class NetworkRelayConnectionHandler : MonoBehaviour
         catch (Exception e)
         {
             Debug.Log(e);
+            MenuManager.instance.MainMenuState();
         }
     }
     #endregion
