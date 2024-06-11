@@ -33,13 +33,13 @@ public class PlayerHealth : NetworkBehaviour
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
         if (!IsServer) return;
 
-        if (collision.gameObject.CompareTag("Anda"))
+        if (other.gameObject.CompareTag("Anda"))
         {
-            NetworkObject andaNetworkObject = collision.gameObject.GetComponent<NetworkObject>();
+            NetworkObject andaNetworkObject = other.gameObject.GetComponent<NetworkObject>();
 
             if (andaNetworkObject != null && andaNetworkObject.OwnerClientId != OwnerClientId)
             {

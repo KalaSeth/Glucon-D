@@ -9,11 +9,6 @@ public class Anda : NetworkBehaviour
     [SerializeField] Rigidbody AndaRB;
     [SerializeField] float Magnitude;
 
-    // Start is called before the first frame update
-    public void Start()
-    {
-        AndaRB.AddForce(transform.forward * Magnitude, ForceMode.Impulse);
-    }
 
     [ServerRpc(RequireOwnership = false)]
     private void DespawnAndDestroyServerRpc()
@@ -27,6 +22,8 @@ public class Anda : NetworkBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (other.gameObject.CompareTag("Player") && other.gameObject.GetComponent<NetworkObject>().OwnerClientId == OwnerClientId) return;
+        
         if (IsServer)
         {
             DespawnAndDestroyServerRpc();

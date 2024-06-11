@@ -48,6 +48,7 @@ public class MainPlayerController : NetworkBehaviour
     [SerializeField] float ChickenShootTimer;
 
     Button ShootButton;
+    [SerializeField] private float spawnForceMagnitude;
     #endregion
 
     #region Start
@@ -85,8 +86,7 @@ public class MainPlayerController : NetworkBehaviour
     {
         AndaCooldown();
 
-        if (!IsOwner) return;
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (IsOwner && Input.GetKeyDown(KeyCode.Space))
         {
             PlayerSkillCall();
         }
@@ -217,9 +217,28 @@ public class MainPlayerController : NetworkBehaviour
         {
             networkObject.SpawnWithOwnership(rpcParams.Receive.SenderClientId);
         }
+
+        ApplyInitialForceClientRpc(networkObject.NetworkObjectId, transform.forward, spawnForceMagnitude);
+
         ShootTimer = ChickenShootTimer;
         ShootCooldown = ShootTimer;
         CanShoot = false;
     }
+    /// <summary>
+    /// Apply force to anda after spawn and sync it
+    /// </summary>
+    [ClientRpc]
+    private void ApplyInitialForceClientRpc(ulong networkObjectId, Vector3 direction, float magnitude)
+    {
+        if (NetworkManager.SpawnManager.SpawnedObjects.TryGetValue(networkObjectId, out var networkObject))
+        {
+            Rigidbody andaRB = networkObject.GetComponent<Rigidbody>();
+            if (andaRB != null)
+            {
+                andaRB.AddForce(direction * magnitude, ForceMode.Impulse);
+            }
+        }
+    }
+
     #endregion
 }
