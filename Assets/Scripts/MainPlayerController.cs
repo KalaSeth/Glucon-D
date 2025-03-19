@@ -210,6 +210,7 @@ public class MainPlayerController : NetworkBehaviour
     {
         if (CanShoot == true)
         {
+            MenuManager.instance.ShootSound.Play();
             SpawnAndaServerRpc();
             AnimateJump();
         }

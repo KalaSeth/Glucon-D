@@ -28,7 +28,8 @@ public class MenuManager : NetworkBehaviour
     [SerializeField] public Text LobbyPlayers;
     public int LobbyCount;
 
-
+    [SerializeField] public AudioSource DeadSound;
+    [SerializeField] public AudioSource ShootSound;
 
     public void Awake()
     {

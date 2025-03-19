@@ -48,6 +48,8 @@ public class GameManager : MonoBehaviour
         {
             DpadParent.SetActive(false);
         }
+
+        Cursor.lockState = CursorLockMode.Confined;
     }
 
     // Update is called once per frame

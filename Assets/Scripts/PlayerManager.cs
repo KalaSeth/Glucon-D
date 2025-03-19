@@ -24,6 +24,7 @@ public class PlayerManager : NetworkBehaviour
         readyButton.onClick.AddListener(() =>
         {
             if (!IsOwner) return;
+            Cursor.lockState = CursorLockMode.Locked;
             SpawnPlayers();
         });
     }

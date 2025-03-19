@@ -377,7 +377,7 @@ public class NetworkRelayConnectionHandler : MonoBehaviour
             Allocation allocation = await RelayService.Instance.CreateAllocationAsync(MaxPlayerLimit, "asia-south1");
             GeneratedJoinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
 
-            RelayServerData relayServerData = new RelayServerData(allocation, "dtls");
+            RelayServerData relayServerData = new RelayServerData(allocation, "wss");
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
             NetworkManager.Singleton.StartHost();
 
@@ -396,7 +396,7 @@ public class NetworkRelayConnectionHandler : MonoBehaviour
         {
             JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(Joincode);
 
-            RelayServerData relayServerData = new RelayServerData(joinAllocation, "dtls");
+            RelayServerData relayServerData = new RelayServerData(joinAllocation, "wss");
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(relayServerData);
             NetworkManager.Singleton.StartClient();
             Debug.Log("Joined Relay");
@@ -415,10 +415,12 @@ public class NetworkRelayConnectionHandler : MonoBehaviour
             {
                 NetworkManager.Singleton.Shutdown();
                 Debug.Log("Disconnected from Relay and closed Netcode connection as Client");
+                MenuManager.instance.MainMenuState();
             }
             else if (NetworkManager.Singleton.IsHost)
             {
                 NetworkManager.Singleton.Shutdown();
+                MenuManager.instance.MainMenuState();
                 Debug.Log("Disconnected from Relay and closed Netcode connection as Host");
             }
         }

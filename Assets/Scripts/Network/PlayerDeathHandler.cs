@@ -21,6 +21,7 @@ public class PlayerDeathHandler : NetworkBehaviour
             isAlive = false;
             NotifyDeathServerRpc();
             NetworkRelayConnectionHandler.Instace.DisconnectRelay();
+            MenuManager.instance.DeadSound.Play();
             Destroy(gameObject);  // Despawn and destroy the player
         }
     }
